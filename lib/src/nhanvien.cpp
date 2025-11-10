@@ -17,7 +17,6 @@ void Staff::ThemNhanVien(string& id, string& name, string& age, string& phoneNum
     setBasicSalary(basicSalary);
 
     ofstream out(nvPath, ios::app);
-    cout << filesystem::absolute(nvPath) << endl;
     if(!out) {
         cout << "Khong mo duoc file!\nThem nhan vien that bai!" << endl;
         return;
@@ -27,7 +26,7 @@ void Staff::ThemNhanVien(string& id, string& name, string& age, string& phoneNum
         << getAge() << "|" << getPhoneNum() << "|"
         << getBasicSalary() << endl;
     
-    cout << "Da them thanh cong nhan vien " << getName() << endl;
+    cout << "Da them thanh cong nhan vien: " << getName() << endl;
     return;
     }
 }

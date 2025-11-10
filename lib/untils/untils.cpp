@@ -24,6 +24,27 @@ bool checkExisted(string newID) {
     return false;
 }
 
+bool checkProduct(string pID) {
+    ifstream in(pdPath);
+    string line, id;
+
+    while (getline(in, line)) {
+        //lay rieng phan id, khong lay cac phan khac
+        size_t pos = line.find('|');
+        if(pos != string::npos) { 
+            /* neu pos khac npos tuc la '|' ton tai trong dong do
+             => dong do co nhieu hon 1 du lieu can thiet la id,
+             nen dung substr(0,pos) de tach phan tu dau tien trong line va sau dau '|',
+             tuc la tach ra chi lay moi ID. */
+            id = line.substr(0, pos);
+        }
+        else id = line;
+        if(id == pID) return true;
+    }
+    in.close();
+    return false;
+}
+
 
 // tach va ghep fields cho sua thong tin
 
@@ -56,4 +77,10 @@ string LinkedFields(vector<string>& fields) {
         if( i != fields.size() - 1) result += "|";
     }
     return result;
+}
+void printBillLine(const string& name, int quantity, float price) {
+    cout << left  << setw(15) << name     // cột tên món, căn trái
+         << right << setw(10) << quantity // cột số lượng, căn phải
+         << right << setw(12) << fixed << setprecision(0) << price // cột đơn giá
+         << endl;
 }

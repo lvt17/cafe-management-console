@@ -1,25 +1,111 @@
 #include "../headers/menu.h"
 
+vector<Product> plist() {
+    vector<Product> pTemp;
+    ifstream in(pdPath);
+    string line;
+    int i = 1;
+    while(getline(in, line)) {
+        if(line.empty()) continue;
+        stringstream ss(line);
+        string id, name, tCost, tPrice;
+        long cost, price;
+        
+        getline(ss, id, '|');
+        getline(ss, name, '|');
+        getline(ss, tCost, '|');
+        getline(ss, tPrice, '|');
+
+        if(!tCost.empty()) cost = stof(tCost);
+        if(!tPrice.empty()) price = stof(tPrice);
+
+        pTemp.push_back({id, name, cost, price});
+    }
+    return pTemp;
+};
+
+auto Order(int tableID, string &pID) {
+    return make_pair(tableID, pID);
+}
+
+
 void showMenu() {
-    cout << "1. Show Menu"         << endl
-         << "2. Tinh tien"         << endl
-         << "3. Quan li ban"       << endl
-         << "4. Quan li san pham"  << endl
-         << "5. Quan li nhan vien" << endl
-         << "6. Quan li doanh thu" << endl;
     int choose;
-    cout << "\n: "; cin >> choose;
+    vector<pair<int,string>> orders;
+    Product p;
+    do {
+        cout << "\n|" << string(5, '_') << "CAFE MANAGEMENT" << string(5, '_') << "|\n" << endl;
+        cout << "1. Show Menu & Order" << endl
+            << "2. Tinh tien"         << endl
+            << "3. Quan li ban"       << endl
+            << "4. Quan li san pham"  << endl
+            << "5. Quan li nhan vien" << endl
+            << "6. Quan li doanh thu" << endl
+            << string(27, '_') << endl
+            << "|" << string(25, ' ') << "|" << endl;
+
+        cout << "\n: "; cin >> choose;
     switch(choose) {
         case 1: {
+            string choose;
+            int tableID;
+            cout << "Nhap so ban cua khach: "; cin >> tableID; cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            do {
+                cout << "*Bam phim 0 de hoan tat order*\n" << endl;
+                p.ShowMenuToCustomer();
+                cout << "\nMon khach chon (id): "; cin >> choose; cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                if(choose != "0") {
+                    if(checkProduct(choose)) {
+                        orders.push_back({Order(tableID, choose)});
+                    }
+                }
+                else {
+                    cout << "Khong co mon do!";
+                    continue;
+                }
+            }while(choose != "0");
             break;
         }
         case 2: {
+            int tableID;
+            cout << "\nNhap so ban: "; cin >> tableID; cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            char billPrint; bool print = false;
+            cout << "\nBan co muon in hoa don khong? (y/n): "; cin >> billPrint; cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            if(tolower(billPrint) == 'y' || tolower(billPrint) == 'n') {
+                if(tolower(billPrint) == 'y') {
+                    cout << "\n-Tinh nang nay dang doi Vtoan lam xong!-" << endl;
+                    print = true;
+                }
+            }
+            else {
+                cout << "lua chon khong hop le!";
+                break;
+            }
+            int voucher = 0;
+            cout << "\nVoucher: "; cin >> voucher; cout << endl;
+            cout << string(16, ' ') << "HOA DON" << endl;
+            TinhTien(orders, plist(), tableID, voucher);
+            cout << string(40, '-') << endl << endl;
             break;
         }
         case 3: {
             break;
         }
         case 4: {
+            int act;
+            Product p;
+            do {
+            cout << "1. Them mon moi"           << endl
+                 << "2. Sua thong tin mon"      << endl
+                 << "3. Xoa mon khoi menu" << endl
+                 << "5. Show danh sach cac mon hien co"     << endl
+                 << "0. Thoat"                        << endl
+                 << "\n: "; cin >> act;
+            if(act >= 1 && act <= 5) {
+                QuanLiSanPham(p, act);
+            }
+            } while (act >= 1 && act <= 5);     
+            break;
             break;
         }
         case 5: {
@@ -46,7 +132,37 @@ void showMenu() {
             break;
         }
     }
+} while(choose != 0);
 }
+
+
+void TinhTien(vector<pair<int,string>> Order, vector<Product> plist, int tableID, int voucher) {
+    long prices = 0;
+    map<string, int> bills;
+    string id;
+    Product p;
+    for(auto& ord: Order) {
+        if(ord.first == tableID) {
+            auto sp = p.findByID(plist, ord.second);
+            bills[sp.getID()] += 1; 
+            prices += sp.getPrice();
+        }
+    }
+    
+    cout << left  << setw(15) << "Ten mon"
+         << right << setw(10) << "So luong"
+         << right << setw(12) << "Don gia" << endl;
+    cout << string(40, '-') << endl;
+    for(auto& [key, value]: bills) {
+        auto sp = p.findByID(plist, key);
+        printBillLine(sp.getName(), value, sp.getPrice());
+    }
+    cout << "\nDiscout: " << voucher << endl;
+    prices -= voucher;
+    cout << "\nTong Tien: " << prices << endl;
+}
+
+
 
 void QuanLiNhanVien(Staff s, int action) {
     switch(action) {
@@ -138,4 +254,32 @@ void QuanLiNhanVien(Staff s, int action) {
         }//end case 5
     }
 
+}
+
+void QuanLiSanPham(Product p, int action) {
+    switch(action) {
+        case 1: {
+            //them san pham
+            string id;
+            cout << "Nhap id mon: "; cin >> id;
+            if(checkProduct(id)) {
+                cout << "Mon nay da co trong menu!";
+            }
+            else {
+                string name; long cost, price; 
+
+                cout << "Nhap ten mon: "; cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+                getline(cin, name); 
+
+                cout << "Nhap tien von: ";  
+                cin >> cost;
+
+                cout << "Nhap doanh thu: "; 
+                cin >> price; 
+ 
+                p.ThemSanPham(id, name, cost, price);
+            } 
+            break;
+        }
+    }
 }
