@@ -1,3 +1,4 @@
+#pragma once
 #include "../untils/untils.h"
 #include <iostream>
 #include <vector>

@@ -6,6 +6,10 @@
         "__locale": "cpp",
         "limits": "cpp",
         "ostream": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "ios": "cpp",
+        "format": "cpp",
+        "fstream": "cpp",
+        "locale": "cpp"
     }
 }

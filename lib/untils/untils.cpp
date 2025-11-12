@@ -49,24 +49,21 @@ bool checkProduct(string pID) {
 // tach va ghep fields cho sua thong tin
 
 // tach fields
-vector<string> TrimFields(string beChangeID, string filePath, const string& line) {
-    ifstream in(filePath);
-    string id;
+vector<string> TrimFields(string beChangeID, const string& line) {
     vector<string> fields;
+    // tách id
     size_t pos = line.find('|');
-        if(pos != string::npos) { 
-            id = line.substr(0, pos); //doan nay y chang o tren, lay id
-        }
-        else id = line;
+    string id = (pos != string::npos) ? line.substr(0, pos) : line;
 
-        if(id == beChangeID) {
-            size_t start = 0, end;
-            while ((end = line.find("|", start)) != string::npos) {
-                fields.push_back(line.substr(start, end - start));
-                start = end + 1;
-            }
-            fields.push_back(line.substr(start));
+    // nếu id khớp thì mới split
+    if (id == beChangeID) {
+        size_t start = 0, end;
+        while ((end = line.find('|', start)) != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
         }
+        fields.push_back(line.substr(start));
+    }
     return fields;
 }
 
@@ -83,4 +80,21 @@ void printBillLine(const string& name, int quantity, float price) {
          << right << setw(10) << quantity // cột số lượng, căn phải
          << right << setw(12) << fixed << setprecision(0) << price // cột đơn giá
          << endl;
+}
+
+
+string currentDateTime() {
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    char buffer[30];
+    strftime(buffer, sizeof(buffer), "%Y%m%d_%H%M%S", ltm);
+    return string(buffer);
+}
+
+string getDateTime() {
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    char buffer[30];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", ltm);
+    return string(buffer);
 }

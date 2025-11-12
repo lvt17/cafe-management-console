@@ -1,3 +1,2 @@
-
-cf|cafe den da|10|25
-cfs|cafe sua|12|27
+cf|cafe den da|10000|25000
+cfs|cafe sua|12000|27000
