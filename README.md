@@ -3,6 +3,7 @@
 contact me: 0386947675 (zalo)
 
 *Comple
+
     -> MacOS: 
         cd cafe-management
         clang++ -o main main.cpp lib/src/dongtien.cpp lib/src/menu.cpp lib/src/nhanvien.cpp lib/src/sanpham.cpp lib/src/tables.cpp lib/untils/untils.cpp
