@@ -5,7 +5,7 @@
 
 
 float Staff::TinhLuong(int& SoGioCong, float& TienThuong, float& TienPhat, float& TienUng) {
-    float total = (SoGioCong * getBasicSalary()) + TienThuong - TienPhat - TienUng;
+    double total = (SoGioCong * getBasicSalary()) + TienThuong - TienPhat - TienUng;
     return total;
 }
 
@@ -210,4 +210,11 @@ void Staff::ShowDanhSach() {
              << string(59, '-') << endl;
     }
     in.close();
+}
+
+Staff Staff::findByID(vector<Staff> ds, string id) {
+    for (auto& s : ds)
+        if (s.getID() == id)
+            return s;
+    return Staff();
 }

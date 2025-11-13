@@ -29,6 +29,30 @@ vector<Product> plist() {
     return pTemp;
 };
 
+vector<Staff> slist() {
+    vector<Staff> sTemp;
+    ifstream in(nvPath);
+    string line;
+    int i = 1;
+    while(getline(in, line)) {
+        if(line.empty()) continue;
+        stringstream ss(line);
+        string id, name, age, phoneNum, temp;
+        float salary = 0;
+        
+        getline(ss, id, '|');
+        getline(ss, name, '|');
+        getline(ss, age, '|');
+        getline(ss, phoneNum, '|');
+        getline(ss, temp, '|');
+
+        if(!temp.empty()) salary = stof(temp);
+
+        sTemp.push_back({id, name, age, phoneNum, salary});
+    }
+    return sTemp;
+};
+
 void showMenu() {
     int choose;
     vector<pair<int,string>> orders;
@@ -121,7 +145,7 @@ void showMenu() {
                  << "0. Thoat"                        << endl
                  << "\n: "; cin >> act;
             if(act >= 1 && act <= 5) {
-                QuanLiNhanVien(nv, act);
+                QuanLiNhanVien(nv, act, slist());
             }
             } while (act >= 1 && act <= 5);     
             break;
@@ -195,7 +219,7 @@ void TinhTien(vector<pair<int,string>> Order, vector<Product> plist, int tableID
 
 
 
-void QuanLiNhanVien(Staff s, int action) {
+void QuanLiNhanVien(Staff& s, int action, vector<Staff> slist) {
     switch(action) {
         case 1: {
             //them nhan vien
@@ -278,6 +302,23 @@ void QuanLiNhanVien(Staff s, int action) {
             break;
         } //end case 3
         case 4: {
+            string id;
+            cout << "Nhap so cccd: "; cin >> id;
+            if(!checkExisted(id)) {
+                cout << "Nhan vien nay khong co trong danh sach!";
+            }
+            auto nv = s.findByID(slist, id);
+            int SoGioCong; float TienThuong = 0, TienPhat = 0, TienUng = 0;
+            cout << "Nhap so gio cong: "; cin >> SoGioCong;
+            cout << "Nhap so tien thuong: "; cin >> TienThuong;
+            cout << "Nhap so tien phat: "; cin >> TienPhat;
+            cout << "Nhap so tien ung truoc: "; cin >> TienUng;
+            float salary = 0;
+            salary = nv.TinhLuong(SoGioCong, TienThuong, TienPhat, TienUng);
+            cout.imbue(locale(""));
+            cout << endl << string(3, '-') << " Luong cua nhan vien " << nv.getName() << ": "
+                 << fixed << setprecision(0) << formatMoney((long long)salary) << " VND " << string(3, '-');
+            cout << endl;
             break;
         }//end case 4
         case 5: {

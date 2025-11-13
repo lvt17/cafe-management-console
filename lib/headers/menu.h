@@ -10,7 +10,7 @@
 #include "../untils/untils.h"
 
 void showMenu();
-void QuanLiNhanVien(Staff s, int action);
+void QuanLiNhanVien(Staff& s, int action, vector<Staff> slist);
 void QuanLiSanPham(Product& p, int action) ;
 auto Order(int tableID, string &pID);
 vector<Product> plist();

@@ -42,5 +42,5 @@ class Staff {
         void XoaNhanVien(string& id);
         void ChinhSuaThongTin(string id, int action);
         void ShowDanhSach();
-    
+        Staff findByID(vector<Staff> ds, string id);
 };

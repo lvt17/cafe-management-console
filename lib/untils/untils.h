@@ -20,3 +20,4 @@ void printBillLine(const string& name, int quantity, float price) ;
 
 string currentDateTime();
 string getDateTime();
+string formatMoney(long long n) ;

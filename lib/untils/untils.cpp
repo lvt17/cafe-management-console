@@ -98,3 +98,13 @@ string getDateTime() {
     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", ltm);
     return string(buffer);
 }
+
+string formatMoney(long long n) {
+    string s = to_string(n);
+    int pos = s.length() - 3;
+    while (pos > 0) {
+        s.insert(pos, ",");
+        pos -= 3;
+    }
+    return s;
+}
