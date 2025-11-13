@@ -18,4 +18,4 @@ contact me: 0386947675 (zalo)
         ./main
 
     -> Windows: 
-        ./main.xe
+        ./main.exe
