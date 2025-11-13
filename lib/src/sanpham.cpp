@@ -214,10 +214,10 @@ void Product::ShowSanPham() {
         if(!tPrice.empty()) price = stof(tPrice);
 
         cout << left  << setw(10) << id          
-     << left  << setw(15) << name           
-     << right << setw(10) << cost       
-     << right << setw(12) << fixed << setprecision(0) << price  
-     << endl << string(60, '-') << endl;
+             << left  << setw(15) << name           
+             << right << setw(10) << cost       
+             << right << setw(12) << fixed << setprecision(0) << price  
+             << endl << string(60, '-') << endl;
         i++;
     }
     if(!hasData) {

@@ -1,6 +1,8 @@
 #include "untils.h"
 using namespace std;
 
+//define null
+const string null = "null";
 
 //check ton tai
 bool checkExisted(string newID) {
@@ -45,6 +47,26 @@ bool checkProduct(string pID) {
     return false;
 }
 
+bool checkTableExist(string tID) {
+    ifstream in(tPath);
+    string line, id;
+
+    while (getline(in, line)) {
+        //lay rieng phan id, khong lay cac phan khac
+        size_t pos = line.find('|');
+        if(pos != string::npos) { 
+            /* neu pos khac npos tuc la '|' ton tai trong dong do
+             => dong do co nhieu hon 1 du lieu can thiet la id,
+             nen dung substr(0,pos) de tach phan tu dau tien trong line va sau dau '|',
+             tuc la tach ra chi lay moi ID. */
+            id = line.substr(0, pos);
+        }
+        else id = line;
+        if(id == tID) return true;
+    }
+    in.close();
+    return false;
+}
 
 // tach va ghep fields cho sua thong tin
 
@@ -108,3 +130,16 @@ string formatMoney(long long n) {
     }
     return s;
 }
+
+void centerText(const string& text, int width, char fill) {
+    cout << string(width, '-') << endl;
+    int pad = (width - text.size()) / 2;
+    if (pad > 0)
+        cout << string(pad, fill) << text << string(pad, fill);
+    else
+        cout << text;
+    cout << endl;
+    cout << string(width, '-') << endl;
+}
+
+
