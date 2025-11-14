@@ -4,8 +4,14 @@ using namespace std;
 
 
 void Table::DatBan(string id, string& cusName, vector<Table> tb) {
-
+    
     Table table = findByID(tb, id);
+    
+    if(table.getState() && table.getCustomer() != null) {
+        cout << "\nBan nay da co nguoi dat truoc, vui long chon ban khac!" << endl;
+        return;
+    }
+
     table.setState(true);
     table.setCustomer(cusName);
 
@@ -13,6 +19,7 @@ void Table::DatBan(string id, string& cusName, vector<Table> tb) {
     string line;
     vector<string> lines;
     bool found = false;
+
 
     while (getline(in, line)) {
         vector<string> fields = TrimFields(id, line);
@@ -201,7 +208,7 @@ void Table::TinhTien(vector<Product> plist, int voucher, bool billPrint) {
 }
 
 void Table::DanhSachBan() {
-    cout << string(18,'-') << "DANH SACH BAN" << string(18,'-') << endl;
+    centerText("DANH SACH BAN" );
 
     ifstream in(tPath);
     string line;

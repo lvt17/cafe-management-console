@@ -1,2 +1,2 @@
-ban_1|null|0
+ban_1|hi|1
 ban_2|null|0

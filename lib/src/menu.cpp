@@ -93,31 +93,38 @@ void showMenu() {
             string choose;
             int qty;
             string tableID;
+            char cusCheck;
             cout << "Nhap so ban cua khach: "; cin >> tableID; cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            if (!currentTableLoaded || currentTable.getID() != tableID) {
-                currentTable = currentTable.findByID(tablist(), tableID);
-                currentTableLoaded = true;
-            }
-            
-            do {
-                cout << string(40, '-') << endl
-                     << "Show Menu & Order" << endl
-                     << string(40, '-') << endl;
-                cout << "\n*Bam phim 0 de hoan tat order*\n" << endl;
-                p.ShowMenuToCustomer();
-                cout << "\nMon khach chon (id): "; cin >> choose; 
-                if(choose != "0") {
-                cout << "\nNhap so luong: "; cin >> qty; 
-                    if(checkProduct(choose)) {
-                        currentTable.addOrder(choose, qty);
-                        currentTable.SaveTable(currentTable, tablist());
-                    }
-                    else {
-                        cout << "Khong co mon do!";
-                        continue;
-                    }
+            Table thisTable = currentTable.findByID(tablist(), tableID);
+            cout << "\nBan nay da co nguoi dat truoc" << endl
+                     << "Co phai day la khach hang " << thisTable.getCustomer() << " khong?"
+                     << "(y/n): "; cin >> cusCheck;
+            if(tolower(cusCheck) == 'y') {
+                if (!currentTableLoaded || currentTable.getID() != tableID) {
+                    currentTable = currentTable.findByID(tablist(), tableID);
+                    currentTableLoaded = true;
                 }
-            }while(choose != "0");
+                
+                do {
+                    centerText("MENU & ORDER"); 
+                    cout << "\n*Bam phim 0 de hoan tat order*\n" << endl;
+                    p.ShowMenuToCustomer();
+                    cout << "\nMon khach chon (id): "; cin >> choose; 
+                    if(choose != "0") {
+                    cout << "\nNhap so luong: "; cin >> qty; 
+                        if(checkProduct(choose)) {
+                            currentTable.addOrder(choose, qty);
+                            currentTable.SaveTable(currentTable, tablist());
+                        }
+                        else {
+                            cout << "Khong co mon do!";
+                            continue;
+                        }
+                    }
+                }while(choose != "0");
+            } else {
+                cout << "Vui long chon ban khac!" << endl;
+            }
             break;
         }
         case 2: {
@@ -129,21 +136,20 @@ void showMenu() {
             }
             else {
                 if (!currentTableLoaded || currentTable.getID() != tableID) {
-                    cout << "Ban nay chua order hoac chua duoc load!" << endl;
+                    cout << "\nBan nay chua order!" << endl;
                     break;
                 }
                 char billPrint; bool print = false;
+                int voucher = 0;
+                cout << "\nVoucher: "; cin >> voucher; cout << endl;
                 cout << "\nBan co muon in hoa don khong? (y/n): "; cin >> billPrint; cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 if(tolower(billPrint) == 'y') {
                     print = true;
                 }
-                int voucher = 0;
-                cout << "\nVoucher: "; cin >> voucher; cout << endl;
                 cout << string(16, ' ') << "HOA DON" << endl;
                 currentTable.TinhTien(plist(), voucher, print);
                 cout << string(40, '-') << endl << endl;
                 currentTableLoaded = false;
-
             }
             break;
         }
@@ -450,55 +456,56 @@ void QuanLiBan(int act, Table& table) {
         case 4:{
             //khach dat ban
             string id, cusName;
+            Table thisTable = table.findByID(tablist(), id);
 
             cout << "Nhap id ban: ";
             cin >> id;
-
             cout << "Nhap ten khach dat ban: "; cin.ignore(numeric_limits<streamsize>::max(), '\n');
             getline(cin, cusName); //vi cai nay co dau cach nen dung getline cho do bi mat chu
 
-            if(checkTableExist(id)) {
-                cout << "--- Ban nay da co trong danh sach roi!!! ---";
+            if(!checkTableExist(id)) {
+                cout << "--- Ban nay khong ton tai!!! ---" << endl;
             }
             else {
-                table.DatBan(id, cusName, tablist());
+                currentTable.DatBan(id, cusName, tablist());
             }
             break;
         }
         case 5: {
             //xem ban da duoc dat truoc
-            if(tablist().empty()) {
+            auto list = tablist();
+            if(list.empty()) {
                 cout << string(30, '-') << endl
-                     << "  Hien tai chua co ai dat ban" << endl
-                     << string(30, '-') << endl;
+                        << "  Hien tai chua co ai dat ban" << endl
+                        << string(30, '-') << endl;
                 break;
             }
-            else {
-                cout << string(40, '-') << endl
+        
+            cout << string(40, '-') << endl
                     << "BAN DA DUOC KHACH DAT TRUOC" << endl
-                    << string(40, '-') << endl;
-                cout << endl;
-                cout << left  << setw(10) << "ID"      
+                    << string(40, '-') << endl << endl;
+        
+            cout << left  << setw(10) << "ID"
                     << left  << setw(15) << "Ten Khach"
                     << endl << string(40, '-') << endl;
-                for(auto& tab: tablist()) {
-                    if(tab.getState() == true) {
-                        cout << left  << setw(10) << table.getID()          
-                            << left  << setw(15) << table.getCustomer() 
+        
+            for (auto& tab : list) {
+                if (tab.getState()) {
+                    cout << left  << setw(10) << tab.getID()
+                            << left  << setw(15) << tab.getCustomer()
                             << endl << string(40, '-') << endl;
-                    }
                 }
-                break;
             }
+            break;
         }
         case 6: {
             //Huy dat ban
             string id;
             cout << "Nhap id ban can huy: "; cin >> id;
+            Table thisTable = table.findByID(tablist(), id);
             //check ban ton tai va trang thai ban true
-            if(checkTableExist(id) && table.findByID(tablist(),id).getState()) {
-            table.HuyDatBan(id, tablist());
-            cout << endl << "--- Da huy ban " << id << " ---" << endl;
+            if(checkTableExist(id) && thisTable.getState()) {
+            thisTable.HuyDatBan(id, tablist());
             }
             else {
                 cout << endl << "Ban nay khong ton tai hoac chua co ai dat!" << endl;
@@ -506,38 +513,45 @@ void QuanLiBan(int act, Table& table) {
             break;
         }
         case 7: {
-            //xem order tung ban
             string id;
-            cout << endl << "Nhap id ban muon xem order: "; cin >> id;
-            if(checkTableExist(id)) {
-                Table thisTable = table.findByID(tablist(), id);
-                if(thisTable.getOrders().empty()) {
-                    cout << endl << string(30, '-') << endl
-                         << "Ban nay chua order!" << endl
-                         << string(30, '-') << endl;
-                }
-                else {
-                    cout << endl << string(40, '-') << endl
-                        << "ORDER CUA BAN" << id << endl
-                        << string(60, '-') << endl;
-                    cout << endl;
-                    cout << left  << setw(10) << "ID"      
-                        << left  << setw(15) << "Ten Mon"
-                        << right << setw(10) << "So Luong" 
-                        << endl << string(60, '-') << endl;
-                    for(auto& p: thisTable.getOrders()) {
-                        cout << left  << setw(10) << id      
-                        << left  << setw(15) << p.first
-                        << right << setw(10) << p.second 
-                        << endl << string(60, '-') << endl;
-                    }
-                }
+            cout << "\nNhap id ban muon xem order: ";
+            cin >> id;
+        
+            if (!checkTableExist(id)) {
+                cout << "\n--- Ban nay khong ton tai trong he thong! ---\n";
+                break;
             }
-            else {
-                cout << endl << "--- Ban nay khong ton tai trong he thong! ---" << endl;
+        
+            // lấy currentTable nếu nó đang load đúng bàn
+            if (!currentTableLoaded || currentTable.getID() != id) {
+                cout << "\nBan nay chua co order hoac chua duoc load!\n";
+                break;
+            }
+        
+            if (currentTable.getOrders().empty()) {
+                cout << "\n------------------------------\n"
+                     << "Ban nay chua order!\n"
+                     << "------------------------------\n";
+            } else {
+                cout << "\n----------------------------------------\n"
+                     << "ORDER CUA BAN " << id << "\n"
+                     << "----------------------------------------\n";
+        
+                cout << left << setw(10) << "ID"
+                     << left << setw(15) << "Ten Mon"
+                     << right << setw(10) << "So Luong"
+                     << endl << string(60,'-') << endl;
+        
+                for (auto& p : currentTable.getOrders()) {
+                    cout << left << setw(10) << p.first
+                         << left << setw(15) << p.first
+                         << right << setw(10) << p.second
+                         << endl << string(60,'-') << endl;
+                }
             }
             break;
         }
+        
 
         default: {
             cout << endl << "--- Vui long chon tu 1 den 7!!! ---" << endl;
@@ -585,9 +599,7 @@ void QuanLiDongTien(DongTien& dt, int action) {
             break;
         }
         case 7: {
-            int sl = dt.tongSanLuong();
-            cout << "\nTong san luong da ban: "
-                 << sl << " mon\n";
+            dt.inSanLuong();
             break;
         }
         case 0: {

@@ -7,6 +7,7 @@
 #include <sstream>
 #include <algorithm>
 #include <string>
+#include <map>
 #include "../untils/untils.h"
 #include "../headers/sanpham.h"
 #include "../headers/dongtien.h"

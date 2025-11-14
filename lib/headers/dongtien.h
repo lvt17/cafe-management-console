@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <map>
+#include "../headers/sanpham.h"
 #include "../untils/untils.h"
 
 using namespace std;
@@ -50,5 +52,6 @@ public:
     static long loiNhuanThangNay();
 
     // san luong (tong so luong ban ra)
-    static long tongSanLuong();
+    static void inSanLuong();
+
 };

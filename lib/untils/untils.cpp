@@ -132,7 +132,7 @@ string formatMoney(long long n) {
 }
 
 void centerText(const string& text, int width, char fill) {
-    cout << string(width, '-') << endl;
+    cout << endl << string(width, '-') << endl;
     int pad = (width - text.size()) / 2;
     if (pad > 0)
         cout << string(pad, fill) << text << string(pad, fill);

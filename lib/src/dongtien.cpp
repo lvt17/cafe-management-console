@@ -5,6 +5,33 @@
 
 #define DT_PATH "./cafe-management/data/dongtien.txt"
 
+// =======================================
+//  LOAD MENU 
+// =======================================
+vector<Product> loadProducts() {
+    vector<Product> pTemp;
+    ifstream in(pdPath);
+    string line;
+
+    while(getline(in, line)) {
+        if(line.empty()) continue;
+        
+        stringstream ss(line);
+        string id, name, tCost, tPrice;
+
+        getline(ss, id, '|');
+        getline(ss, name, '|');
+        getline(ss, tCost, '|');
+        getline(ss, tPrice, '|');
+
+        long cost = stol(tCost);
+        long price = stol(tPrice);
+
+        pTemp.push_back(Product(id, name, cost, price));
+    }
+    return pTemp;
+}
+
 // ham tach datetime tu string sang tm de so sanh
 static tm parseDT(const string& dt) {
     tm t = {};
@@ -27,7 +54,7 @@ static bool sameDay(const string& dt) {
             t.tm_mday == n->tm_mday);
 }
 
-// kiem tra trong cung tuan (7 ngay tro lai)
+// kiem tra cung tuan (7 ngay tro lai)
 static bool sameWeek(const string& dt) {
     tm t = parseDT(dt);
     time_t now = time(0);
@@ -72,7 +99,6 @@ vector<DongTien> DongTien::loadAll() {
     ifstream in(DT_PATH);
 
     if(!in) {
-        // tao auto tao file nếu chưa có
         ofstream create(DT_PATH);
         create.close();
         return list;
@@ -91,13 +117,12 @@ vector<DongTien> DongTien::loadAll() {
         getline(ss, prof, '|');
         getline(ss, dt); 
 
-        if(id.empty() || dt.size() < 19) continue; // auto skip dòng lỗi
+        if(id.empty() || dt.size() < 19) continue;
 
         list.push_back(DongTien(id, ods, stol(rev), stol(prof), dt));
     }
     return list;
 }
-
 
 //-------------------------------------------
 // DOANH THU
@@ -148,12 +173,21 @@ long DongTien::loiNhuanThangNay() {
 }
 
 //-------------------------------------------
-// SAN LUONG
+// SAN LUONG CHI TIET (ID - TEN - SL - VON - DOANH THU)
 //-------------------------------------------
-long DongTien::tongSanLuong() {
-    long total = 0;
+void DongTien::inSanLuong() {
+    vector<DongTien> all = loadAll();
+    if(all.empty()) {
+        cout << "Chua co hoa don nao!\n";
+        return;
+    }
 
-    for(auto& x : loadAll()) {
+    map<string, pair<long, pair<long,long>>> data;
+
+    vector<Product> plist = loadProducts();
+    Product p;
+
+    for(auto& x : all) {
         string ods = x.getOrders();
         if(ods.empty()) continue;
 
@@ -163,9 +197,42 @@ long DongTien::tongSanLuong() {
         while (getline(ss, item, ',')) {
             size_t pos = item.find(':');
             if(pos != string::npos) {
-                total += stoi(item.substr(pos + 1));
+                string id = item.substr(0, pos);
+                long sl = stol(item.substr(pos + 1));
+
+                auto sp = p.findByID(plist, id);
+
+                data[id].first += sl;
+                data[id].second.first  = sp.getCost();
+                data[id].second.second = sp.getPrice();
             }
         }
     }
-    return total;
+
+    centerText("SAN LUONG DA BAN", 70);
+
+    cout << left << setw(10) << "ID"
+         << left << setw(20) << "TEN MON"
+         << right << setw(12) << "SL"
+         << right << setw(12) << "VON"
+         << right << setw(12) << "DOANH THU" << "\n";
+
+    cout << string(70, '-') << "\n";
+
+    for(auto& kv : data) {
+        auto sp = p.findByID(plist, kv.first);
+
+        long sl = kv.second.first;
+        long cost = kv.second.second.first;
+        long price = kv.second.second.second;
+
+        cout << left << setw(10) << kv.first
+             << left << setw(20) << sp.getName()
+             << right << setw(12) << sl
+             << right << setw(12) << sl * cost
+             << right << setw(12) << sl * price
+             << "\n";
+
+        cout << string(70, '-') << "\n";
+    }
 }
